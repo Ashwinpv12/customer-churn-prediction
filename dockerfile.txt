@@ -1,0 +1,25 @@
+# Use the same Python version as CI and the model bundle target
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY requirements.txt ./
+
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY . .
+
+# Copy the production model bundle if it exists
+# This path must exist before build or the build will fail
+COPY src/serving/model/production /app/model
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app/src \
+    MODEL_DIR=/app/model
+
+EXPOSE 8000 10000
+
+CMD ["sh", "-c", "python -m uvicorn src.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
