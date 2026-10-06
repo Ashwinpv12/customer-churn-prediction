@@ -1,18 +1,7 @@
 ## Telco Churn – End-to-End ML Project
 ### Purpose
 
-Build a machine-learning solution for telecom customer churn, with repeatable data preparation and training, a FastAPI prediction API, and a Gradio web UI deployable as a public Render web service.
-
-### Results
-
-| Metric | Value |
-| --- | ---: |
-| Precision | 0.4904 |
-| Recall | 0.8209 |
-| F1 Score | 0.6140 |
-| ROC AUC | 0.8367 |
-
-These values were logged by the MLflow training pipeline and represent the current recorded benchmark for the production model bundle.
+Build a machine-learning solution for telecom customer churn, with repeatable data preparation and training, a FastAPI prediction API, and a Gradio web UI that can be deployed on Render in the future.
 
 ### Problem solved & benefits
 
@@ -28,13 +17,24 @@ These values were logged by the MLflow training pipeline and represent the curre
 - Inference service: FastAPI app exposing /predict (POST) and a root health check /.
 - Web UI: Gradio interface mounted at /ui for quick, shareable manual testing.
 - Containerization: Docker image with uvicorn entrypoint (src.app.main:app) listening on port 8000.
-- CI/CD: GitHub Actions runs tests and a container smoke test; Render is configured to deploy after checks pass.
-- Hosting: Render Docker web service with managed public HTTPS, configured via `render.yaml`.
+- CI/CD: GitHub Actions runs tests and a container smoke test; Render deployment can be configured after checks pass.
+- Hosting: Render Docker web service planned for managed public HTTPS, configured via `render.yaml`.
+
+### Results
+
+| Metric | Value |
+| --- | ---: |
+| Precision | 0.4904 |
+| Recall | 0.8209 |
+| F1 Score | 0.6140 |
+| ROC AUC | 0.8367 |
+
+These values were logged by the MLflow training pipeline and represent the current recorded benchmark for the model bundle in this repository.
 
 ### Deployment flow (high-level)
 
 - Push to main → GitHub Actions runs the automated tests and container smoke test.
-- After checks pass, Render builds the Dockerfile and deploys the web service.
+- After checks pass, Render can build the Dockerfile and deploy the web service.
 - Render checks `/` for health; users open `/ui` for Gradio or call `POST /predict` for predictions.
 
 ### Selecting and packaging the serving model
@@ -51,7 +51,7 @@ docker build -t telco-churn .
 
 ### Deploy the live app on Render
 
-This repository includes a Render Blueprint in `render.yaml`. After the latest project commit is pushed to GitHub, connect the repository to Render and create a Blueprint from that file. Render will build the Docker image and expose the web service.
+This repository includes a Render Blueprint in `render.yaml`. Once the project is connected to Render, this file can be used to create the deployment configuration.
 
 The Blueprint uses Render's free web-service plan where available; free services may sleep while idle and take time to wake. For a continuously available demo or heavier traffic, select a paid plan.
 
