@@ -5,7 +5,14 @@ Build a machine-learning solution for telecom customer churn, with repeatable da
 
 ### Results
 
-- Model performance metrics (precision, recall, F1, ROC AUC, and training/evaluation timing) are logged to MLflow during each training run; re-run `python scripts/run_pipeline.py --input data/raw/Telco-Customer-Churn.csv --target Churn` to refresh the current benchmark and update the reported results.
+| Metric | Value |
+| --- | ---: |
+| Precision | 0.4904 |
+| Recall | 0.8209 |
+| F1 Score | 0.6140 |
+| ROC AUC | 0.8367 |
+
+These values were logged by the MLflow training pipeline and represent the current recorded benchmark for the production model bundle.
 
 ### Problem solved & benefits
 
