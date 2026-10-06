@@ -3,6 +3,10 @@
 
 Build a machine-learning solution for telecom customer churn, with repeatable data preparation and training, a FastAPI prediction API, and a Gradio web UI deployable as a public Render web service.
 
+### Results
+
+- Model performance metrics (precision, recall, F1, ROC AUC, and training/evaluation timing) are logged to MLflow during each training run; re-run `python scripts/run_pipeline.py --input data/raw/Telco-Customer-Churn.csv --target Churn` to refresh the current benchmark and update the reported results.
+
 ### Problem solved & benefits
 
 - Faster decisions: Predicts which customers are likely to churn so teams can act before they leave.
@@ -28,9 +32,9 @@ Build a machine-learning solution for telecom customer churn, with repeatable da
 
 ### Selecting and packaging the serving model
 
-The serving app loads exactly one bundle from `MODEL_DIR`; it no longer guesses a model based on filesystem timestamps. First run the training pipeline, then choose the resulting finished MLflow run ID and package that run before building the Docker image. The package command checks that the run passed data validation and that its model, feature list, fitted preprocessing schema, and classification threshold are present and consistent. Serving applies that run's threshold to its predicted churn probability.
+The serving app loads exactly one bundle from `MODEL_DIR`; it no longer guesses a model based on filesystem timestamps. First run the training pipeline, then choose the resulting finished MLflow run and package it with `scripts/package_model.py`.
 
-The default bundle destination is `src/serving/model/production`, which is included in the repository and copied by the Dockerfile to `/app/model`. Commit the generated bundle when promoting a model so CI builds use the same version. Set `MODEL_DIR` to another complete bundle directory for local or alternate deployments. Do not copy a model from one run and preprocessing files from another.
+The default bundle destination is `src/serving/model/production`, which is included in the repository and copied by the Dockerfile to `/app/model`. Commit the generated bundle when promoting a model to production.
 
 ```powershell
 python scripts/run_pipeline.py --input data/raw/Telco-Customer-Churn.csv --target Churn
@@ -40,9 +44,9 @@ docker build -t telco-churn .
 
 ### Deploy the live app on Render
 
-This repository includes a Render Blueprint in `render.yaml`. After the latest project commit is pushed to GitHub, connect the repository to Render and create a Blueprint from that file. Render will build the Docker image and deploy the FastAPI service. The interactive Gradio page is at `/ui`; the prediction API is `POST /predict`, and `/` is the health check. The service binds to Render's `PORT` setting (10000 in the Blueprint, 8000 for local Docker runs).
+This repository includes a Render Blueprint in `render.yaml`. After the latest project commit is pushed to GitHub, connect the repository to Render and create a Blueprint from that file. Render will build the Docker image and expose the web service.
 
-The Blueprint uses Render's free web-service plan where available; free services may sleep while idle and take time to wake. For a continuously available demo or heavier traffic, select a paid plan. The app itself does not require application secrets.
+The Blueprint uses Render's free web-service plan where available; free services may sleep while idle and take time to wake. For a continuously available demo or heavier traffic, select a paid plan.
 
 The GitHub repository must contain the deployment commit before Render can build it. If you don't have write access, push the changes to a fork and connect that repository to Render.
 
